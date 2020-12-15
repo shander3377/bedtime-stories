@@ -1,5 +1,8 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, FlatList, ScrollView } from "react-native";
+import {SearchBar, Header} from 'react-native-elements';
+import db from '../config'
+import firebase from 'firebase'
 
 export default class SearchScreen extends React.Component {
   constructor(props) {
@@ -16,28 +19,43 @@ export default class SearchScreen extends React.Component {
       this.setState({ allStories: [...this.state.allStories, doc.data()] });
     });
   };
-//   SearchFilterFunction = async (searchtext) => {
-//       var text = searchtext.split();
-//       const searched = await db.collection("stories").where()
-//   }
+  componentDidMount=()=>{
+    this.retriveStories();
+  }
+  SearchFilterFunction = async (searchtext) => {
+      var text = searchtext.split();
+      const searched = await db.collection("stories").where('title', '==', searchtext).get()
+     searched.docs.map((doc)=>{
+        this.setState({
+         dataSource: doc,
+         search: searchtext
+        })
+      })
+    }
   render() {
     return (
-      <View style={styles.searchBar}>
-        <TextInput
-          style={styles.bar}
-          placeholder="Enter Book Id or Student Id"
-          onChangeText={(text) => {
-            this.setState({ search: text });
-          }}
-        />
-        <TouchableOpacity
-          style={styles.searchButton}
-          onPress={() => {
-            this.searchTransactions(this.state.search);
-          }}
-        >
-          <Text>Search</Text>
-        </TouchableOpacity>
+      <View style={styles.container}>
+
+     <SearchBar
+                    placeholder="Search story with story name....."
+                    onChangeText={(text)=>{this.SearchFilterFunction(text)}}
+                    value={this.state.search}
+                />
+   
+<View>
+        <ScrollView>
+          {this.state.dataSource.map((Story, index)=>{
+            return(
+              <View key={index} style={{borderWidth: 2}}>
+                <Text>{"By:: " + Story.author}</Text>
+              <Text>{"Title: " + Story.title}</Text>
+              <Text>{Story.storyText}</Text>
+              <Text>{"Date: " + Story.date.toDate()}</Text>
+              </View>
+            )
+          })}
+          </ScrollView>  
+</View>
       </View>
     );
   }
