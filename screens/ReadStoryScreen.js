@@ -43,18 +43,21 @@ export default class SearchScreen extends React.Component {
                 />
    
 <View>
-        <ScrollView>
-          {this.state.dataSource.map((Story, index)=>{
-            return(
-              <View key={index} style={{borderWidth: 2}}>
-                <Text>{"By:: " + Story.author}</Text>
-              <Text>{"Title: " + Story.title}</Text>
-              <Text>{Story.storyText}</Text>
-              <Text>{"Date: " + Story.date.toDate()}</Text>
-              </View>
-            )
-          })}
-          </ScrollView>  
+        
+          <FlatList
+          data={this.state.dataSource}
+          renderItem={({item})=>(
+            <View style={{borderBottomWidth: 2}}>
+                <Text>{"By: " + item.author}</Text>
+              <Text>{"Title: " + item.title}</Text>
+              <Text>{item.storyText}</Text>
+              <Text>{"Date: " + item.date.toDate()}</Text>
+            </View>
+          )}
+          keyExtractor= {(item, index)=> index.toString()}
+          onEndReached ={this.SearchFilterFunction}
+          onEndReachedThreshold={0.7}
+        /> 
 </View>
       </View>
     );
